@@ -11,5 +11,5 @@ const port = 8000;
 app.use('/messages', messages);
 
 app.listen(port, () => {
-    console.log('server started on port' + port);
+    console.log('server started on port ' + port);
 }); 

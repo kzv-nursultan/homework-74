@@ -1,17 +1,30 @@
 const fs = require('fs');
+const path = "./messages";
 
-const fileName = './db.json';
-
+let newData = null;
 let data = [];
 
 module.exports = {
     init() {
         try {
-            const fileContents = fs.readFileSync(fileName);
-            data = JSON.parse(fileContents);
+            fs.readdir(path, (err, files) => {
+                if (err) {
+                    console.error(err);
+                } else {
+                    files.forEach(file => { 
+                        const message = fs.readFileSync(path + '/' + file)
+                        const info = JSON.parse(message.toString());
+                        if(data.length >= 5){
+                            const difference = (data.length)-4;
+                            data.splice(0,difference);
+                        };
+                        data.push(info);
+                    });
+                }   
+            });
         } catch (e) {
             data = [];
-        }
+        };
     },
 
     getItems() {
@@ -19,14 +32,17 @@ module.exports = {
     },
 
     addItem(item) {
-        data.push(item);
+        item.date = new Date();
+        newData = item;
+        if(data.length >= 5){
+            const difference = (data.length)-4;
+            data.splice(0,difference);
+        };
+        data.push(newData);
         this.save();
     },
-    getItemById(id){
-        return data.find(item => item.id === id);
-    },
-
     save() {
-        fs.writeFileSync(fileName, JSON.stringify(data, null, 2));
+        const fileName = './messages/' + new Date() + '.txt';
+        fs.writeFileSync(fileName, JSON.stringify(newData));
     }
 };
